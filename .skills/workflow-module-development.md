@@ -78,7 +78,7 @@ later.
 
 | Method | Purpose |
 |--------|---------|
-| `Engine() *workflow.WorkflowEngine` | Permission queries (`CanView`, `CanReview`, `CanEditForm`, `CanResubmit`) |
+| `Engine() *workflow.WorkflowEngine` | Permission queries (`CanView`, `CanReview`, `CanEditForm`, `CanResubmit`, `CanWithdraw`, `CanRevokeApprove`) |
 | `Store() *gormstore.Store` | Direct GORM access, shared transactions via `Store.Transact` |
 | `Service() *workflow.Service` | Full underlying service |
 
@@ -97,6 +97,8 @@ All of these return `ErrNotReady` if the manager has not been attached yet:
 - `Submit(ctx, applicationID)`
 - `Approve(ctx, applicationID, operatorID)`
 - `Return(ctx, applicationID, operatorID, comment)` — comment required
+- `Withdraw(ctx, applicationID, comment)` — owner pulls an in-review app back to Draft
+- `RevokeApprove(ctx, applicationID, operatorID, comment)` — reviewer cancels own pending approval (ALL stage, quorum still outstanding)
 - `Resubmit(ctx, applicationID)`
 - `RejectClose(ctx, applicationID, operatorID, comment)` — comment required
 - `GetApplication(ctx, applicationID)`
@@ -112,8 +114,8 @@ All of these return `ErrNotReady` if the manager has not been attached yet:
 | `StatusDraft`, `StatusInReview`, `StatusReturned`, `StatusApproved`, `StatusRejectedClosed` | constants |
 | `ReturnModeStrict`, `ReturnModeDirect` | constants |
 | `ReviewTypeSingle`, `ReviewTypeAll` | constants |
-| `ActionSubmit`, `ActionApprove`, `ActionReturn`, `ActionRejectClose` | constants |
-| `ErrInvalidStatus`, `ErrNoPermission`, `ErrCommentRequired`, `ErrTemplateEmpty`, `ErrTemplateMismatch`, `ErrAlreadyApproved`, `ErrInvalidTemplate`, `ErrStaleReturnStage`, `ErrNotFound` | error variables |
+| `ActionSubmit`, `ActionApprove`, `ActionReturn`, `ActionRejectClose`, `ActionWithdraw`, `ActionRevokeApprove` | constants |
+| `ErrInvalidStatus`, `ErrNoPermission`, `ErrCommentRequired`, `ErrTemplateEmpty`, `ErrTemplateMismatch`, `ErrAlreadyApproved`, `ErrInvalidTemplate`, `ErrStaleReturnStage`, `ErrNotFound`, `ErrRevokeNotAllowed`, `ErrNothingToRevoke` | error variables |
 | `ErrNotReady` | **module-specific** — manager called before `OnStart` attached the store |
 
 ## Injection example

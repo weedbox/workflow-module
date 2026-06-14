@@ -151,6 +151,104 @@ func TestReturnAndResubmit(t *testing.T) {
 	}
 }
 
+func TestWithdraw_OwnerPullsBackToDraft(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, mgr := startApp(t)
+
+	tpl := workflowmodule.WorkflowTemplate{
+		ID:         "withdrawable",
+		ReturnMode: workflowmodule.ReturnModeDirect,
+		Stages: []workflowmodule.WorkflowStage{
+			{StageIndex: 1, ReviewType: workflowmodule.ReviewTypeSingle, ApproverIDs: []string{"manager"}},
+		},
+	}
+	if err := mgr.SaveTemplate(ctx, tpl); err != nil {
+		t.Fatalf("SaveTemplate: %v", err)
+	}
+
+	app := workflowmodule.Application{ID: "wd-001", WorkflowID: tpl.ID, OwnerID: "alice"}
+	if err := mgr.CreateDraft(ctx, app); err != nil {
+		t.Fatalf("CreateDraft: %v", err)
+	}
+	if _, _, err := mgr.Submit(ctx, app.ID); err != nil {
+		t.Fatalf("Submit: %v", err)
+	}
+
+	// Owner withdraws the in-review application back to Draft.
+	withdrawn, log, err := mgr.Withdraw(ctx, app.ID, "changed my mind")
+	if err != nil {
+		t.Fatalf("Withdraw: %v", err)
+	}
+	if withdrawn.Status != workflowmodule.StatusDraft {
+		t.Fatalf("status after withdraw = %q, want Draft", withdrawn.Status)
+	}
+	if log.Action != workflowmodule.ActionWithdraw {
+		t.Fatalf("log action = %q, want %q", log.Action, workflowmodule.ActionWithdraw)
+	}
+}
+
+func TestRevokeApprove_AllStageQuorumOutstanding(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, mgr := startApp(t)
+
+	// A single ALL (co-sign) stage requiring both approvers.
+	tpl := workflowmodule.WorkflowTemplate{
+		ID:         "cosign",
+		ReturnMode: workflowmodule.ReturnModeStrict,
+		Stages: []workflowmodule.WorkflowStage{
+			{StageIndex: 1, ReviewType: workflowmodule.ReviewTypeAll, ApproverIDs: []string{"a", "b"}},
+		},
+	}
+	if err := mgr.SaveTemplate(ctx, tpl); err != nil {
+		t.Fatalf("SaveTemplate: %v", err)
+	}
+
+	app := workflowmodule.Application{ID: "cs-001", WorkflowID: tpl.ID, OwnerID: "dave"}
+	if err := mgr.CreateDraft(ctx, app); err != nil {
+		t.Fatalf("CreateDraft: %v", err)
+	}
+	if _, _, err := mgr.Submit(ctx, app.ID); err != nil {
+		t.Fatalf("Submit: %v", err)
+	}
+
+	// "a" approves; quorum (2 of 2) is still outstanding, so it stays in review.
+	mid, _, err := mgr.Approve(ctx, app.ID, "a")
+	if err != nil {
+		t.Fatalf("Approve a: %v", err)
+	}
+	if mid.Status != workflowmodule.StatusInReview {
+		t.Fatalf("status after first approve = %q, want In_Review", mid.Status)
+	}
+
+	// "a" revokes their own still-pending approval.
+	revoked, log, err := mgr.RevokeApprove(ctx, app.ID, "a", "made a mistake")
+	if err != nil {
+		t.Fatalf("RevokeApprove: %v", err)
+	}
+	if revoked.Status != workflowmodule.StatusInReview || revoked.CurrentStageIndex != 1 {
+		t.Fatalf("unexpected state after revoke: status=%s stage=%d", revoked.Status, revoked.CurrentStageIndex)
+	}
+	if log.Action != workflowmodule.ActionRevokeApprove {
+		t.Fatalf("log action = %q, want %q", log.Action, workflowmodule.ActionRevokeApprove)
+	}
+
+	// After revoking, "a" can approve again and then "b" completes the quorum.
+	if _, _, err := mgr.Approve(ctx, app.ID, "a"); err != nil {
+		t.Fatalf("re-approve a: %v", err)
+	}
+	final, _, err := mgr.Approve(ctx, app.ID, "b")
+	if err != nil {
+		t.Fatalf("Approve b: %v", err)
+	}
+	if final.Status != workflowmodule.StatusApproved {
+		t.Fatalf("final status = %q, want Approved", final.Status)
+	}
+}
+
 func TestWithDatabaseName_SelectsNamedConnector(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

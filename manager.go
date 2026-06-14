@@ -129,6 +129,27 @@ func (m *WorkflowManager) Return(ctx context.Context, applicationID, operatorID,
 	return svc.Return(ctx, applicationID, operatorID, comment)
 }
 
+// Withdraw pulls a still-in-review application back to Draft on the owner's
+// behalf. Like Submit/Resubmit it trusts the caller to have verified the
+// requester is the owner; gate with Engine().CanWithdraw upstream if needed.
+func (m *WorkflowManager) Withdraw(ctx context.Context, applicationID, comment string) (workflow.Application, workflow.ReviewLog, error) {
+	svc, err := m.svc()
+	if err != nil {
+		return workflow.Application{}, workflow.ReviewLog{}, err
+	}
+	return svc.Withdraw(ctx, applicationID, comment)
+}
+
+// RevokeApprove cancels operatorID's own pending approval at the current stage.
+// Only valid for an ALL stage whose quorum is still outstanding.
+func (m *WorkflowManager) RevokeApprove(ctx context.Context, applicationID, operatorID, comment string) (workflow.Application, workflow.ReviewLog, error) {
+	svc, err := m.svc()
+	if err != nil {
+		return workflow.Application{}, workflow.ReviewLog{}, err
+	}
+	return svc.RevokeApprove(ctx, applicationID, operatorID, comment)
+}
+
 // Resubmit puts a Returned application back into the review queue.
 func (m *WorkflowManager) Resubmit(ctx context.Context, applicationID string) (workflow.Application, workflow.ReviewLog, error) {
 	svc, err := m.svc()

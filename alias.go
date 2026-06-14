@@ -36,10 +36,12 @@ const (
 
 // Review log actions.
 const (
-	ActionSubmit      = workflow.ActionSubmit
-	ActionApprove     = workflow.ActionApprove
-	ActionReturn      = workflow.ActionReturn
-	ActionRejectClose = workflow.ActionRejectClose
+	ActionSubmit        = workflow.ActionSubmit
+	ActionApprove       = workflow.ActionApprove
+	ActionReturn        = workflow.ActionReturn
+	ActionRejectClose   = workflow.ActionRejectClose
+	ActionWithdraw      = workflow.ActionWithdraw
+	ActionRevokeApprove = workflow.ActionRevokeApprove
 )
 
 // Engine and store errors.
@@ -53,4 +55,6 @@ var (
 	ErrInvalidTemplate  = workflow.ErrInvalidTemplate
 	ErrStaleReturnStage = workflow.ErrStaleReturnStage
 	ErrNotFound         = workflow.ErrNotFound
+	ErrRevokeNotAllowed = workflow.ErrRevokeNotAllowed
+	ErrNothingToRevoke  = workflow.ErrNothingToRevoke
 )

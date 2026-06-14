@@ -52,8 +52,8 @@ github.com/weedbox/common-modules v0.0.44 h1:QtwJ53xnlSV6FoxWjoKyjCaYtBimWyRgG8h
 github.com/weedbox/common-modules v0.0.44/go.mod h1:mUJ5n0Pc+6GXaZX5s+qapXHCKOx84hgsVRl2qVx4P6Y=
 github.com/weedbox/weedbox v0.0.2 h1:fJ2R7sUpROfzy2tldftle7MALteBJZmiLaAhQ0/k4ng=
 github.com/weedbox/weedbox v0.0.2/go.mod h1:hUQuWYe/NTJRRQyQvQ2FntLQr/NFYPE5iljGpBziGnQ=
-github.com/weedbox/workflow v0.1.0 h1:y7Lj08ETHXwn6If1B6TWmB3vaLP9Ozv3rxSYUWMZrG8=
-github.com/weedbox/workflow v0.1.0/go.mod h1:SkZXU7QKTxB2tGLhanPfww9rDxrMNqwYor0/lqlTz6A=
+github.com/weedbox/workflow v0.2.0 h1:/uT9kfRFyJxEQd4MHfq21sdAFT7vQaHU4sBjJV/x4HE=
+github.com/weedbox/workflow v0.2.0/go.mod h1:SkZXU7QKTxB2tGLhanPfww9rDxrMNqwYor0/lqlTz6A=
 go.uber.org/dig v1.19.0 h1:BACLhebsYdpQ7IROQ1AGPjrXcP5dF80U3gKoFzbaq/4=
 go.uber.org/dig v1.19.0/go.mod h1:Us0rSJiThwCv2GteUN0Q7OKvU7n5J4dxZ9JKUXozFdE=
 go.uber.org/fx v1.24.0 h1:wE8mruvpg2kiiL1Vqd0CC+tr0/24XIB10Iwp2lLWzkg=

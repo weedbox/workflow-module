@@ -64,12 +64,13 @@ func (m *LeaveModule) OnStart(ctx context.Context) error {
 ```
 
 The manager exposes everything `workflow.Service` does (`CreateDraft`,
-`Submit`, `Approve`, `Return`, `Resubmit`, `RejectClose`, `GetApplication`,
-`ListLogs`, `SaveTemplate`, `GetTemplate`) plus accessors:
+`Submit`, `Approve`, `Return`, `Withdraw`, `RevokeApprove`, `Resubmit`,
+`RejectClose`, `GetApplication`, `ListLogs`, `SaveTemplate`, `GetTemplate`)
+plus accessors:
 
 | Accessor | Returns | Use for |
 |----------|---------|---------|
-| `Engine()` | `*workflow.WorkflowEngine` | `CanView` / `CanReview` / `CanEditForm` / `CanResubmit` permission queries |
+| `Engine()` | `*workflow.WorkflowEngine` | `CanView` / `CanReview` / `CanEditForm` / `CanResubmit` / `CanWithdraw` / `CanRevokeApprove` permission queries |
 | `Store()` | `*gormstore.Store` | Low-level GORM reads, shared transactions |
 | `Service()` | `*workflow.Service` | Direct service access when you need it |
 
@@ -88,7 +89,7 @@ workflowmodule.ReviewLog
 workflowmodule.StatusDraft / StatusInReview / StatusReturned / StatusApproved / StatusRejectedClosed
 workflowmodule.ReturnModeStrict / ReturnModeDirect
 workflowmodule.ReviewTypeSingle / ReviewTypeAll
-workflowmodule.ActionSubmit / ActionApprove / ActionReturn / ActionRejectClose
+workflowmodule.ActionSubmit / ActionApprove / ActionReturn / ActionRejectClose / ActionWithdraw / ActionRevokeApprove
 
 workflowmodule.ErrInvalidStatus / ErrNoPermission / ErrCommentRequired / ...
 ```

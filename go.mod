@@ -6,7 +6,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/weedbox/common-modules v0.0.44
 	github.com/weedbox/weedbox v0.0.2
-	github.com/weedbox/workflow v0.1.0
+	github.com/weedbox/workflow v0.2.0
 	go.uber.org/fx v1.24.0
 	go.uber.org/zap v1.27.1
 	gorm.io/driver/sqlite v1.6.0
